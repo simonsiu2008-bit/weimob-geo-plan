@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# 生成产物
+*.pptx
+*.pdf
+*.zip
+cases/*/output/
+
+# 隐私隔离：真实客户案例（永不入库）
+_private_cases/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统
+.DS_Store
+Thumbs.db

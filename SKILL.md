@@ -1,6 +1,6 @@
 ---
 name: weimob-geo-plan
-description: "This skill should be used when producing a 微盟星启 GEO 优化方案 (GEO optimization proposal) for a brand/client — a fixed 20-slide PPT, a 话题词方案 HTML, plus a separate 销售话术/讲稿 (internal sales talk-track) and optional PDF. It runs on a shared engine + per-case isolated config architecture (data never leaks between cases), applies the locked framework: domestic 6 AI platforms (主) plus overseas 5 (輔), palette-based styling auto-matched by industry/client, AIVO four-dimension scoring, the L1/L2/L3 topic-keyword framework with 五问测试, the 可见度双指标 (brand-word vs category-word) discipline, 销售转化增强 elements (rank anchor / source citation board), and — for regulated categories such as overseas 保健品 selling into mainland China without 蓝帽子 — the 合规红线 that forbids all function/efficacy claims. Also enforces data-labeling discipline (估算 data labeled 診斷模型估算, forbidden markers 虛擬/⚠️/website/{{). Trigger when a user asks to redo a client proposal, produce a GEO plan, design GEO 话题词, or wants current AI-platform exposure, question-frequency, and competitor-tactics data embodied and highlighted in the proposal."
+description: "This skill should be used when producing a 微盟星启 GEO 优化方案 (GEO optimization proposal) for a brand/client — a fixed 20-slide PPT, a 话题词方案 HTML, plus a separate 销售话术/讲稿 (internal sales talk-track) and optional PDF. It runs on a shared engine + per-case isolated config architecture (data never leaks between cases), applies the locked framework: domestic 6 AI platforms (主) plus overseas 5 (輔), palette-based styling auto-matched by industry/client, AIVO four-dimension scoring, the L1/L2/L3 topic-keyword framework with 五问测试, the 可见度双指标 (brand-word vs category-word) discipline, 销售转化增强 elements (rank anchor / source citation board), and — for regulated categories such as overseas 保健品 selling into mainland China without 蓝帽子 — the 合规红线 that forbids all function/efficacy claims. Also enforces data-labeling discipline (估算 data labeled 診斷模型估算, forbidden markers 虛擬/⚠️/website/{{). Trigger when a user asks to redo a client proposal, produce a GEO plan, design GEO 话题词, or wants current AI-platform exposure, question-frequency, and competitor-tactics data embodied and highlighted in the proposal. The workflow opens with a hard version-scope confirmation (国内版 / 海外版 / 双版; see references/version_scope.md) and a mandatory online-evidence capture step (A 線上實查 / B 客戶提供 / C 診斷模型估算; see references/evidence_capture.md), renders pain points as AI-Q&A evidence cards via scripts/build_evidence.py, and follows plain-language chart-first presentation rules (references/plain_language.md)."
 ---
 
 # 微盟星启 GEO 优化方案生成器
@@ -11,6 +11,8 @@ description: "This skill should be used when producing a 微盟星启 GEO 优化
 數據在案例之間不穿透，每一案例可單獨、有針對性呈現。
 
 方案圍繞客戶最關切的三件事——**當前 AI 平臺曝光度、高頻問題被提及次數、對手在 AI 平臺的做法**——用數據體現並重點標注。
+
+方案生成前有兩道硬性前置關卡：**① 版本範圍確認**（國內版 / 海外版 / 雙版，見 `references/version_scope.md`）；**② 線上數據實查**（公開證據優先，A/B/C 分級標註，見 `references/evidence_capture.md`）。呈現上遵循**白話 + 圖表優先**規範（見 `references/plain_language.md`），讓客戶老闆看得懂、後期運營接得住。
 
 本 skill 整合三個版本優點：
 
@@ -29,8 +31,11 @@ description: "This skill should be used when producing a 微盟星启 GEO 优化
 | ② 合規紅線 | 受監管品類（尤其海外保健品進內地無藍帽子）禁止一切功效表述 | `references/compliance_guide.md` |
 | ③ 銷售轉化增強 | 排名錨點 / 零價值曝光 / 信源引用次數榜 / 公式透明 | `references/sales_power.md` |
 | ④ 可見度雙指標 | 品牌詞可見度 vs 品類詞可見度分開呈現，避免單一數字被誤讀 | `references/visibility_dual.md` |
+| ⑤ 版本範圍確認 | 先確認 國內版/海外版/雙版，再按範圍定平臺池/語言/口徑 | `references/version_scope.md` |
+| ⑥ 線上實查證據 | WebSearch/WebFetch 收公開證據 + 痛點問答證據卡，A/B/C 分級標註 | `references/evidence_capture.md` |
+| ⑦ 白話表達 | 術語→白話對照 + 圖表優先 + 每頁一句話重點與下一步 | `references/plain_language.md` |
 
-所有估算數據嚴格標註「診斷模型估算」，禁用 虛擬 / ⚠️ / website / {{ 等標記。
+數據標註分三級：**A 線上實查**（帶日期與來源）/ **B 客戶提供** / **C 診斷模型估算**；凡估算一律標「診斷模型估算」，禁用 虛擬 / ⚠️ / website / {{ 等標記。分級規則見 `references/evidence_capture.md`。
 
 ---
 
@@ -52,6 +57,7 @@ weimob-geo-plan/
 ├── cases/<name>/             # 每案例隔離目錄（數據隔離的核心）
 │   ├── config.py             # PPT 數據：CONFIG + PALETTE + OUT_FILENAME
 │   ├── topic_config.py       # 話題詞方案數據：TOPIC_CONFIG（可選）
+│   ├── evidence_config.py    # 痛點問答證據卡數據：EVIDENCE_CONFIG（建議）
 │   ├── pollute_words.txt     # 本案例行業詞（供其他 case 反查，勿列通用詞）
 │   └── output/               # 本案例全部交付物輸出於此，獨立隔離
 └── references/               # 方法論 / 決策規則（不硬編碼進引擎）
@@ -77,7 +83,7 @@ weimob-geo-plan/
 
 ## Fixed Framework (不可改動)
 
-- **平臺雙版本**：國內版 6（主）= 豆包 / DeepSeek / 阿里千問 / 百度AI / 元寶 / Kimi；海外版 5（輔）= ChatGPT / Perplexity / Claude / Gemini / Copilot。
+- **平臺雙版本**：平臺池固定為 國內 6（豆包 / DeepSeek / 阿里千問 / 百度AI / 元寶 / Kimi）＋ 海外 5（ChatGPT / Perplexity / Claude / Gemini / Copilot）；**方案版本範圍（國內版 / 海外版 / 雙版）由 Step 1 硬性確認後寫入 `VERSION_SCOPE`**，按範圍取用平臺池、語言與口徑（見 `references/version_scope.md`）。
 - **配色（邏輯色名）**：引擎用 11 個邏輯色名（BLUE/NAVY/CYAN/CLOUD/INK/GRAY/WHITE/GREEN/AMBER/RED/LIGHTBLUE），
   具體 hex 由 `config.py` 的 `PALETTE` 決定；字體也來自 palette 的 `font` 字段。
 - **AIVO 四維等權（各 25%）**：AI搜索可見性 / 基建完善度 / 競爭優勢 / 輿情健康度；評級 ≥90優 / ≥75良 / ≥60一般 / <60較差。
@@ -119,10 +125,22 @@ mkdir -p cases/<name>/output
 ```
 每案例一個目錄，不共用數據文件。已有案例直接使用其 `config.py` / `topic_config.py`。
 
-### Step 1 — 收集客戶輸入 + 合規判定
-向用戶索取：品牌名（含子品牌）、產品類型、官網（可選）、競品列表、聯絡卡片。
+### Step 1 — 版本範圍確認（硬性關卡）+ 收集客戶輸入 + 合規判定
+**第一個動作（先於一切內容決策）：向用戶確認版本範圍——國內版 / 海外版 / 雙版。**
+未確認前不得進入 Step 2。確認後寫入 `config.py` 的 `VERSION_SCOPE`，並按 `references/version_scope.md`
+對照表定平臺池、語言、DIAG 口徑、監測池與敘事重點。
+接著向用戶索取：品牌名（含子品牌）、產品類型、官網（可選）、競品列表、聯絡卡片。
 若用戶提供網址，先用 WebSearch / WebFetch 核實品牌事實（門店、產品線、母公司、資質），再錨定數據。
 **同時完成合規品類判定**，結論寫入 `config.py` 的 `COMPLIANCE`。
+
+### Step 1.5 — 線上數據實查（硬性前置；解決「報告太簡單」的根因）
+診斷數據**先實查、後估算**，不得直接用模擬數填充：
+1. 按 `references/evidence_capture.md` 實查清單，用 WebSearch / WebFetch 收集公開證據：
+   官網可抓性、權威平臺收錄（百科/新聞/百家號/知乎）、社媒聲量、負面信息、競品內容佈局。
+2. 證據分三級標註：**A 線上實查**（帶日期＋來源）、**B 客戶提供**、**C 診斷模型估算**（只補實查不到的缺口）。
+3. 實查結果直接餵入 PPT 第 4/5/7/12/14/15 頁數據卡——A/B 級優先，報告厚度由證據量決定。
+4. 把三類痛點場景（對手出現本品牌缺席 / 本品牌負面提及 / 信息錯誤過時）整理為
+   `cases/<name>/evidence_config.py`，供 Step 4.5 生成痛點問答證據卡。
 
 ### Step 2 — 決定風格（design_system.md 決策規則）
 按行業 + 客戶信息，在 `cases/<name>/config.py` 設 `PALETTE`：
@@ -158,6 +176,17 @@ python3 scripts/build_topic.py cases/<name>
 產出 `<品牌>_国内版GEO话题词方案.html`。含：合規紅線 / 風險提示 / 話題地圖 / L1-L3 話題卡 / 監測池 / 五問測試 / 三階段節奏。
 
 > 話題詞方案 HTML 的 `TOPICS` 與 PPT `TOPIC_WORDS`（第 18 頁）必須一致；Stage 3 另须与报价表一字不差。
+
+### Step 4.5 — 痛點問答證據卡（第 3 份客戶交付物，強烈建議）
+用模擬 AI 平臺問答還原的「截圖式」證據卡，把痛點做到客戶一眼看懂：
+1. 確認 `cases/<name>/evidence_config.py` 已按 Step 1.5 實查結果填好三類卡（absent / negative / wrong）。
+2. 運行：
+```bash
+python3 scripts/build_evidence.py cases/<name>
+```
+3. 產出 `<品牌>_<版本>GEO問答證據卡.html` 到 `cases/<name>/output/`——對話氣泡還原「客戶問 → AI 答」，
+   高亮競品與本品牌，每卡附白話痛點與建議下一步。
+4. 標註紀律：頁眉聲明「示意問答還原」，每卡帶 A/B/C 證據級別；禁忌標記同 PPT。規範見 `references/evidence_capture.md`。
 
 ### Step 5 — 生成客戶版 PPT（Stage 3）
 ```bash
@@ -215,10 +244,12 @@ python3 scripts/qa_check.py <case>
 - `topic_engine.py` — 話題詞方案 HTML 渲染核心，`build_topic_html(topic_config, out)`。
 - `talktrack.py` — 銷售話術/講稿生成核心，`build_talktrack(config, topic_config, out)`。
 - `qa_engine.py` — 交付前 QA，`run_qa(case, ...)` 含跨 case 自動反查。
+- `evidence_engine.py` — 痛點問答證據卡 HTML 渲染核心，`build_evidence_cards(cfg)`。
 
 ### scripts/（CLI 薄封裝）
 - `build_deck.py` / `build_topic.py` / `build_talktrack.py` — 傳 `cases/<name>`，動態載入該 case 配置。
 - `qa_check.py` — `python3 scripts/qa_check.py <case>`。
+- `build_evidence.py` — 傳 `cases/<name>`，讀 `evidence_config.py` 生成痛點問答證據卡 HTML。
 
 ### cases/
 > ⚠️ **隱私：本 skill 發佈版不攜帶任何真實客戶案例**。`cases/` 僅含一個脫敏結構模板。
@@ -237,6 +268,9 @@ python3 scripts/qa_check.py <case>
 - `compliance_guide.md` — SAMR 24 項合規功能、藍帽子資質、四條內容安全邊界、禁用詞表、功效→硬事實改寫劇本、合規檢查表。**受監管品類必讀**。
 - `sales_power.md` — 六項成交焦慮要素、到頁面映射、話術增強片段、使用邊界。
 - `visibility_dual.md` — 品牌詞/品類詞雙指標方案、呈現規範、口徑對照。
+- `version_scope.md` — **版本範圍確認（國內/海外/雙版）差異對照與落地規則**。Step 1 必讀。
+- `evidence_capture.md` — **線上實查清單、A/B/C 證據分級、痛點問答證據卡規範**。Step 1.5 / 4.5 必讀。
+- `plain_language.md` — **術語→白話對照、圖表優先、每頁一句話重點**表達規範。填 CONFIG 前必讀。
 
 ---
 
@@ -246,6 +280,6 @@ python3 scripts/qa_check.py <case>
 - **數據隔離是本 skill 最高優先硬性要求**：案例間不得穿透。換新客戶 = 新建 `cases/<name>/`，QA 自動跨 case 反查兜底。
 - **模板污染是第二高風險**：換客戶時務必逐項替換 CONFIG 的 `ECO_MAP` / `SOURCE_TABLE` / `SENTIMENT_BULLETS` / `GAP_ROWS` / `CAPABILITY_MAP` / `ROADMAP_TABLE`，並在 Step 7 用其他 case 的 `pollute_words` 反查。
 - **合規污染是第三高風險**：功效詞一旦出現在交付物，客戶可能承擔廣告法與食品安全法風險。受監管品類務必四處同查。
-- 估算數據為模型模擬收錄，非真實 API 調用；如需「真實收錄證據」應另做一輪實檢。
+- 估算數據為模型模擬收錄；**Step 1.5 線上實查為硬性前置**——能實查的公開證據一律先實查（A 級），實查不到的 AI 平臺內問答場景才用估算（C 級），且痛點呈現優先用證據卡還原而非裸數字。
 - 20 頁是硬約束。新增能力一律以「CONFIG 條件插字」或「獨立 HTML 交付物」實現，不得新增頁面或形狀。
 - 不對診斷結果做法律或商業決策背書；合規結論以客戶法務與監管機關口徑為準。

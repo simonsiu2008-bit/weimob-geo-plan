@@ -15,6 +15,7 @@
 | `scripts/build_topic.py cases/<name>` | 生成话题词方案 HTML | `cases/<name>/topic_config.py` |
 | `scripts/build_talktrack.py cases/<name>` | 生成销售话术/讲稿（内部） | `config.py` + `topic_config.py` |
 | `scripts/qa_check.py <case>` | 交付前 QA（含跨 case 反查） | 全部 `cases/*/pollute_words.txt` |
+| `scripts/build_evidence.py cases/<name>` | 生成痛點問答證據卡 HTML | `cases/<name>/evidence_config.py` |
 
 - **风格**：`config.py` 的 `PALETTE` 决定配色（逻辑色名映射，见 `design_system.md`），引擎代码零硬编码色。
 - **双轨**：客户版（PPT/HTML）纯净；销售话术独立成 `.md`（见 `dual_track.md`）。
@@ -30,6 +31,7 @@
 |---|---|---|---|
 | 1 | `<品牌>_微盟星启GEO优化方案.pptx` | `build_deck.py` | 主交付 · 20 页（纯净，不含话术） |
 | 2 | `<品牌>_国内版GEO话题词方案.html` | `build_topic.py` | 话题词方案（L1/L2/L3 + 监测池 + 合规红线） |
+| 3 | `<品牌>_<版本>GEO问答证据卡.html` | `build_evidence.py` | 痛点问答证据卡（对手缺席/负面提及/信息过时，示意问答还原） |
 
 ### B 轨 · 销售内部（不对外）
 
@@ -103,10 +105,11 @@
 
 ---
 
-## 五、平臺雙版本（固定，不可改）
+## 五、平臺雙版本（平臺池固定；版本範圍由 Step 1 確認）
 
-- **國內版 6（主）**：豆包 / DeepSeek / 阿里千問 / 百度AI / 元寶 / Kimi
-- **海外版 5（輔）**：ChatGPT / Perplexity / Claude / Gemini / Copilot
+- **平臺池（固定）**：國內 6 = 豆包 / DeepSeek / 阿里千問 / 百度AI / 元寶 / Kimi；海外 5 = ChatGPT / Perplexity / Claude / Gemini / Copilot
+- **VERSION_SCOPE（`config.py`，Step 1 硬性確認）**：`国内版` / `海外版` / `双版`——決定實際取用哪個平臺池、
+  語言（簡/繁/英）、DIAG 口徑與監測池構成；對照表見 `version_scope.md`。雙版 KPI 必須分池呈現，禁止合成單一總數。
 
 ---
 
@@ -115,6 +118,7 @@
 | 規則 | 做法 | 違禁 |
 |---|---|---|
 | 估算數據標註 | 一律標「**診斷模型估算**」並註明口徑，如 `微盟星启 GEO 診斷模型估算（國內 6 平臺 × 20 問模擬收錄）` | 不可寫「實測」「實際收錄」 |
+| 線上實查標註 | A 級證據標「**線上實查（YYYY-MM-DD，來源：xxx）**」，B 級標「**客戶提供（YYYY-MM-DD）**」 | 不可把 C 級估算寫成實查；不可只標「實查」無日期無來源 |
 | 禁用標記 | — | `虛擬` / `⚠️` / `website` / `{{` |
 | 被引用率表示 | 用 `0.33（30/90）` 形式 | 不可只給單一概率無出處 |
 | 可見度表示 | **必須雙指標**：品牌詞可見度 + 品類詞可見度分列，並給行業頭部參照 | 不可只給一個籠統的「可見度 0.57」 |
@@ -148,6 +152,8 @@
 10. **話題詞一致性**：PPT 第 18 頁 `TOPIC_WORDS` 與話題詞 HTML 的 `TOPICS` 文本完全一致；**Stage 3 另须与报价表一字不差**。
 11. **公式透明**：可見度公式（`命中場景 ÷ 場景總數`）在交付物中至少出現一次，讓客戶能自行復算。
 12. **雙軌純淨性**：客戶版 PPT/HTML 中不得出現現場話術（`script_v`）；銷售版 `.md` 須含「內部資料，僅限銷售使用」。
+13. **證據卡檢查（若有交付）**：每卡帶 A/B/C 級別；頁眉有「示意問答還原」聲明；痛點與建議為白話（過 `plain_language.md` 術語自查）；禁忌標記為 0。
+14. **版本範圍一致**：`VERSION_SCOPE` 與 DIAG 口徑、平臺列表、監測池、證據卡 badge 多處一致。
 
 ### 合規專項自查腳本（受監管品類）
 

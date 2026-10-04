@@ -14,12 +14,20 @@
 | `scripts/build_deck.py cases/<name>` | 生成 20 页客户版 PPT | `cases/<name>/config.py` |
 | `scripts/build_topic.py cases/<name>` | 生成话题词方案 HTML | `cases/<name>/topic_config.py` |
 | `scripts/build_talktrack.py cases/<name>` | 生成销售话术/讲稿（内部） | `config.py` + `topic_config.py` |
+| `scripts/build_evidence_cards.py cases/<name>` | 生成痛點問答證據卡 HTML | `cases/<name>/evidence_config.py` |
+| `scripts/build_evidence_report.py cases/<name>` | 生成 AI 實測證據報告 HTML（需採集） | `cases/<name>/evidence/manifest.json` |
 | `scripts/qa_check.py <case>` | 交付前 QA（含跨 case 反查） | 全部 `cases/*/pollute_words.txt` |
-| `scripts/build_evidence.py cases/<name>` | 生成痛點問答證據卡 HTML | `cases/<name>/evidence_config.py` |
 
 - **风格**：`config.py` 的 `PALETTE` 决定配色（逻辑色名映射，见 `design_system.md`），引擎代码零硬编码色。
+- **语言**：`config.py` 的 `LANG_STYLE` 决定用语（`mainland` 简体默认 / `hk_business` 香港商业繁体，见 `hk_style.md`）。
+- **视觉版本**：`config.py` 的 `VISUAL_STYLES` 列表决定输出哪些版本并**并行输出**——
+  `classic`（默认，文件名保持 `OUT_FILENAME` 原名，原版本保留）、`guizang_card`（歸藏卡片風，
+  文件名追加 `_歸藏卡片版`）。`--style` 参数可只构建单版本。
+- **投放版本**：`config.py` 的 `VERSION` 决定平台口径（`domestic` 国内 6 / `overseas` 海外 5 / `both` 双版本，
+  省略 = `both`）。`VERSION_SCOPE`（写于 `evidence_config.py`）是它的中文展示映射，须与之一致；
+  對照表見 `version_scope.md`。
 - **双轨**：客户版（PPT/HTML）纯净；销售话术独立成 `.md`（见 `dual_track.md`）。
-- **隔离**：每案例独立目录 + 独立 output；QA 自动扫描其他案例污染词（见「六、QA」）。
+- **隔离**：每案例独立目录 + 独立 output；QA 自动扫描其他案例污染词（见「七、QA」）。
 
 ---
 
@@ -29,9 +37,12 @@
 
 | # | 文件 | 生成器 | 说明 |
 |---|---|---|---|
-| 1 | `<品牌>_微盟星启GEO优化方案.pptx` | `build_deck.py` | 主交付 · 20 页（纯净，不含话术） |
-| 2 | `<品牌>_国内版GEO话题词方案.html` | `build_topic.py` | 话题词方案（L1/L2/L3 + 监测池 + 合规红线） |
-| 3 | `<品牌>_<版本>GEO问答证据卡.html` | `build_evidence.py` | 痛点问答证据卡（对手缺席/负面提及/信息过时，示意问答还原） |
+| 1 | `<品牌>_微盟星启GEO优化方案.pptx` | `build_deck.py` | 主交付 · 20 页（纯净，不含话术）· classic 版 |
+| 1b | `<品牌>_...方案_歸藏卡片版.pptx`（可选） | `build_deck.py --style guizang_card` | 歸藏卡片風視覺版（與 classic 並行，兩版內容一致） |
+| 2 | `<品牌>_国内版GEO话题词方案.html` | `build_topic.py` | 话题词方案（L1/L2/L3 + 监测池 + 合规红线）· classic 版 |
+| 2b | `<品牌>_...方案_歸藏卡片版.html`（可选） | `build_topic.py --style guizang_card` | 歸藏卡片風視覺版（暗底玻璃卡片） |
+| 3 | `<品牌>_<版本>GEO问答证据卡.html` | `build_evidence_cards.py` | 痛点问答证据卡（对手缺席/负面提及/信息过时，示意问答还原，A/B/C 分级） |
+| 4 | `<品牌>_AI实测证据报告.html`（可选） | `build_evidence_report.py` | AI 实测证据报告（真实采集截图，需 Playwright + 登录态） |
 
 ### B 轨 · 销售内部（不对外）
 
@@ -105,11 +116,12 @@
 
 ---
 
-## 五、平臺雙版本（平臺池固定；版本範圍由 Step 1 確認）
+## 五、平臺雙版本（平臺池固定；版本範圍由 Step 1.5 確認）
 
 - **平臺池（固定）**：國內 6 = 豆包 / DeepSeek / 阿里千問 / 百度AI / 元寶 / Kimi；海外 5 = ChatGPT / Perplexity / Claude / Gemini / Copilot
-- **VERSION_SCOPE（`config.py`，Step 1 硬性確認）**：`国内版` / `海外版` / `双版`——決定實際取用哪個平臺池、
-  語言（簡/繁/英）、DIAG 口徑與監測池構成；對照表見 `version_scope.md`。雙版 KPI 必須分池呈現，禁止合成單一總數。
+- **VERSION（`config.py`，Step 1.5 硬性確認）**：`domestic` / `overseas` / `both`——決定實際取用哪個平臺池、
+  KPI 口徑與監測池構成；對照表見 `version_scope.md`。雙版 KPI 必須分池呈現，禁止合成單一總數。
+- **`VERSION_SCOPE`（`evidence_config.py`）**：`国内版` / `海外版` / `双版`，是 `VERSION` 的中文展示映射，供證據卡頁眉 badge 用。
 
 ---
 
@@ -118,13 +130,13 @@
 | 規則 | 做法 | 違禁 |
 |---|---|---|
 | 估算數據標註 | 一律標「**診斷模型估算**」並註明口徑，如 `微盟星启 GEO 診斷模型估算（國內 6 平臺 × 20 問模擬收錄）` | 不可寫「實測」「實際收錄」 |
-| 線上實查標註 | A 級證據標「**線上實查（YYYY-MM-DD，來源：xxx）**」，B 級標「**客戶提供（YYYY-MM-DD）**」 | 不可把 C 級估算寫成實查；不可只標「實查」無日期無來源 |
 | 禁用標記 | — | `虛擬` / `⚠️` / `website` / `{{` |
 | 被引用率表示 | 用 `0.33（30/90）` 形式 | 不可只給單一概率無出處 |
 | 可見度表示 | **必須雙指標**：品牌詞可見度 + 品類詞可見度分列，並給行業頭部參照 | 不可只給一個籠統的「可見度 0.57」 |
 | 排名錨點 | 用 `競品池 41 個品牌，本品牌排 #16` 形式，池規模與名次同時給 | 不可只給名次不給池規模 |
 | 信源引用榜 | 用 `百家号 84 次` 形式列 Top 5，並註明統計口徑 | 不可只說「信源不足」無量化 |
 | 聯絡方式 | 僅留銷售聯絡卡，勿放網站 URL | — |
+| 線上實查標註 | A 級證據標「**線上實查（YYYY-MM-DD，來源：xxx）**」，B 級標「**客戶提供（YYYY-MM-DD）**」 | 不可把 C 級估算寫成實查；不可只標「實查」無日期無來源 |
 | 功效表述（受監管品類） | 只寫成分事實 / 正品辨別 / 認證背書 / 選購方法 | 一切功效與效果詞（詳見 `compliance_guide.md`） |
 
 **可見度雙指標為何是硬性**：單給「0.57」客戶會誤讀成「已經行業領先」，
@@ -136,7 +148,9 @@
 ## 七、QA 清單（交付前逐項核）
 
 > 首選跑自動檢查器：`python3 scripts/qa_check.py <case名>`。
-> 檢查器自動掃描 **其他所有 case** 的 `pollute_words.txt` 做跨案例反查，並檢查本 case 的 PPT + 話題詞 HTML。
+> 檢查器自動掃描 **其他所有 case** 的 `pollute_words.txt` 做跨案例反查，並對本 case `output/` 目錄的
+> **全部** `.pptx` 與 `.html` 交付物（含 `_歸藏卡片版` 等多視覺版本）**逐份**執行同一套檢查；
+> 僅一份文件時報告行與歷史格式一致，多份時行尾以 `[文件名]` 標注。
 > 退出碼 0 為通過。以下為其覆蓋的規則與人工複核點。
 
 1. **越界 OOB**：任一 shape `top + height > 7.5"` 計為越界，須為 0。
@@ -153,7 +167,7 @@
 11. **公式透明**：可見度公式（`命中場景 ÷ 場景總數`）在交付物中至少出現一次，讓客戶能自行復算。
 12. **雙軌純淨性**：客戶版 PPT/HTML 中不得出現現場話術（`script_v`）；銷售版 `.md` 須含「內部資料，僅限銷售使用」。
 13. **證據卡檢查（若有交付）**：每卡帶 A/B/C 級別；頁眉有「示意問答還原」聲明；痛點與建議為白話（過 `plain_language.md` 術語自查）；禁忌標記為 0。
-14. **版本範圍一致**：`VERSION_SCOPE` 與 DIAG 口徑、平臺列表、監測池、證據卡 badge 多處一致。
+14. **版本範圍一致**：`VERSION` / `VERSION_SCOPE` 與 DIAG 口徑、平臺列表、監測池、證據卡 badge 多處一致。
 
 ### 合規專項自查腳本（受監管品類）
 

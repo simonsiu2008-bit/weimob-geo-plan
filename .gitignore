@@ -14,6 +14,10 @@ cases/*/output/
 # 隐私隔离：真实客户案例（永不入库）
 _private_cases/
 
+# 隐私隔离：登录态凭证 + 采集证据（含客户品牌截图，永不入库）
+_private/
+cases/*/evidence/
+
 # 编辑器
 .vscode/
 .idea/

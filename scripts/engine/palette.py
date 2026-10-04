@@ -46,6 +46,19 @@ PALETTES = {
         "font_numeral": "JetBrains Mono",
         "chart_series": ["#16706A", "#0F4A46"],
     },
+    "xiaomi_orange": {
+        "name": "科技橙",
+        "colors": {
+            # 智能电动车 / 消费科技硬件 → 品牌橙 #FF6900 + 炭黑灰阶（消费科技视觉语言）
+            "BLUE": "#FF6900", "NAVY": "#262626", "CYAN": "#FFB366",
+            "CLOUD": "#FAF7F4", "INK": "#2B1A0E", "GRAY": "#757068",
+            "WHITE": "#FFFFFF", "GREEN": "#1F8A4C", "AMBER": "#D97706",
+            "RED": "#D63A2F", "LIGHTBLUE": "#FFF0E5",
+        },
+        "font": "微軟雅黑",
+        "font_numeral": "Arial",
+        "chart_series": ["#FF6900", "#FFB366"],  # 雷达图两条序列
+    },
     "heritage_green": {
         "name": "自然保育綠",
         "colors": {

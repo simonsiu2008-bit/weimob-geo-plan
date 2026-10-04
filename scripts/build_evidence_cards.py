@@ -27,7 +27,7 @@ def load_module(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("case_dir", help="case 目录，如 cases/meiriki")
+    ap.add_argument("case_dir", help="case 目录，如 cases/acme")
     ap.add_argument("--out", default=None, help="覆盖输出路径")
     args = ap.parse_args()
 

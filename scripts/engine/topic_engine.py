@@ -128,7 +128,9 @@ def render_compliance(tc):
     comp = tc.get("COMPLIANCE") or {}
     if not comp.get("applicable"):
         return ""
-    forbidden = "".join(f'<span class="forbid">{_esc(w)}</span>' for w in comp["forbidden"])
+    # 每個禁用詞自身帶否定標記：清單過長時，開頭的「絕不出現」會超出 QA 的 400 字元窗口，
+    # 導致後段詞被誤判為非否定語境（2026-10 修）。
+    forbidden = "".join(f'<span class="forbid">禁用 {_esc(w)}</span>' for w in comp["forbidden"])
     allowed = "".join(f'<span>{_esc(a)}</span>' for a in comp["allowed"])
     return f"""
 <section style="padding:0"><div class="wrap"><div class="compliance">

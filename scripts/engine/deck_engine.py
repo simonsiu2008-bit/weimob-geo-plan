@@ -106,6 +106,22 @@ def build_deck(config, palette, output_path):
     # 增强变量（可选）
     VIS_DUAL = V("VIS_DUAL"); RANK_POOL = V("RANK_POOL")
     SOURCE_CITE = V("SOURCE_CITE"); COMPLIANCE = V("COMPLIANCE", {"applicable": False})
+    # 個案化文案（未提供時退回通用預設，向後兼容）
+    VERSION_SCOPE = V("VERSION_SCOPE", "双版")          # 国内版 / 海外版 / 双版
+    INDUSTRY_SUB = V("INDUSTRY_SUB", f"{PRODUCT_TYPE}零售的 GEO 機會（利基定位）")
+    EXCELLENT_LINE = V("EXCELLENT_LINE", 0.70)          # 第 5 頁「優秀線」
+    PREF_SCORE_TEXT = V("PREF_SCORE_TEXT", "可被 AI 采信度評分：60 / 100")
+    PREF_ROWS = V("PREF_ROWS", None)
+    PREF_FOOTNOTE = V("PREF_FOOTNOTE",
+                      "✓ 具備 / △ 部分 / ✗ 不足。結構化 FAQ 與簡中多語為最優先補強項，"
+                      "直接對應微盟星启「內容創作與改造優化」模塊。")
+    AIVO_NOTES = V("AIVO_NOTES", None)
+    INFRA_FOOTNOTE = V("INFRA_FOOTNOTE",
+                       "基建總評：官方站 + 權威媒體已具基礎，但「國內自媒體缺位」與"
+                       "「可被 AI 引用的簡中結構化深度」不足——正是微盟星启內容改造的切入點。")
+    SENTIMENT_HEAD_SUFFIX = V("SENTIMENT_HEAD_SUFFIX", "低風險 · 趨勢穩定")
+    SENTIMENT_RATE_NOTE = V("SENTIMENT_RATE_NOTE", "負面率 ~2%（3/150）· 低風險")
+    BRAND_POSITION_NOTE = V("BRAND_POSITION_NOTE", "長尾，利基定位")
 
     # ---- 工具函数 ----
     def slide(): return prs.slides.add_slide(blank)
@@ -191,7 +207,11 @@ def build_deck(config, palette, output_path):
     txt(s, Inches(0.9), Inches(1.0), Inches(6), Inches(0.5), "微盟星启 GEO", size=16, color=C["WHITE"], bold=True)
     txt(s, Inches(0.85), Inches(2.5), Inches(11.6), Inches(1.3), BRAND_CN, size=42, color=C["WHITE"], bold=True)
     txt(s, Inches(0.9), Inches(3.75), Inches(11.6), Inches(0.8), "微盟星启 GEO 優化方案", size=30, color=C["CYAN"], bold=True)
-    txt(s, Inches(0.9), Inches(4.7), Inches(11.5), Inches(0.5), "國內版 6 平臺（主） · 海外版 5 平臺（輔）雙版本佈局", size=15, color=C["WHITE"])
+    _ver_line = {
+        "国内版": "國內版 6 平臺（豆包 / DeepSeek / 阿里千問 / 百度AI / 元寶 / Kimi）",
+        "海外版": "海外版 5 平臺（ChatGPT / Perplexity / Claude / Gemini / Copilot）",
+    }.get(VERSION_SCOPE, "國內版 6 平臺（主） · 海外版 5 平臺（輔）雙版本佈局")
+    txt(s, Inches(0.9), Inches(4.7), Inches(11.5), Inches(0.5), _ver_line, size=15, color=C["WHITE"])
     txt(s, Inches(0.9), Inches(5.3), Inches(11.5), Inches(0.5), "讓你的品牌，在 AI 推薦中被看見", size=18, color=C["WHITE"])
     txt(s, Inches(10.6), Inches(5.55), Inches(2.4), Inches(0.5), "微盟 Weimob", size=14, color=C["WHITE"], align=PP_ALIGN.RIGHT)
 
@@ -251,7 +271,7 @@ def build_deck(config, palette, output_path):
     # Slide 4 — 行業 AI 搜索現狀
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "行業 AI 搜索現狀", f"{PRODUCT_TYPE}零售的 GEO 機會（利基定位）")
+    header(s, "行業 AI 搜索現狀", INDUSTRY_SUB)
     x = Inches(0.8)
     for big, label, col, src in STAT_CARDS:
         rect(s, x, Inches(1.6), Inches(3.7), Inches(3.5), fill=C["WHITE"], line=CM[col], line_w=1.5, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
@@ -272,7 +292,7 @@ def build_deck(config, palette, output_path):
     txt(s, Inches(0.8), Inches(3.75), Inches(5.4), Inches(0.5), f"{CITED} / {TOTAL_SCEN} 次模擬收錄場景中出現", size=13, color=C["WHITE"], align=PP_ALIGN.CENTER)
     rect(s, Inches(1.1), Inches(4.45), Inches(4.8), Inches(1.5), fill=C["BLUE"], shape=MSO_SHAPE.ROUNDED_RECTANGLE)
     txt(s, Inches(1.1), Inches(4.6), Inches(4.8), Inches(0.55), f"曝光缺口 {GAP_PCT}%", size=22, color=C["WHITE"], bold=True, align=PP_ALIGN.CENTER)
-    txt(s, Inches(1.1), Inches(5.15), Inches(4.8), Inches(0.75), f"每 100 次相關提問，僅 {int(CITE_RATE*100)} 次見到本品牌；優秀線 0.70，尚差 {round(0.70-CITE_RATE,2)}", size=11.5, color=C["WHITE"], align=PP_ALIGN.CENTER)
+    txt(s, Inches(1.1), Inches(5.15), Inches(4.8), Inches(0.75), f"每 100 次相關提問，僅 {int(CITE_RATE*100)} 次見到本品牌；優秀線 {EXCELLENT_LINE:.2f}，尚差 {round(EXCELLENT_LINE-CITE_RATE,2)}", size=11.5, color=C["WHITE"], align=PP_ALIGN.CENTER)
     if VIS_DUAL:
         txt(s, Inches(0.85), Inches(6.0), Inches(5.4), Inches(0.5),
             f"雙指標（診斷模型估算）：品牌詞 {VIS_DUAL['brand_word']:.0%} · 品類詞 {VIS_DUAL['category_word']:.0%}（行業頭部≈{VIS_DUAL['industry_top']:.0%}）",
@@ -319,8 +339,8 @@ def build_deck(config, palette, output_path):
     # Slide 9 — 引用偏好框架（7 維度）
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "從 AI 喜好入手 · 引用偏好框架（7 維度）", "可被 AI 采信度評分：60 / 100")
-    data = [
+    header(s, "從 AI 喜好入手 · 引用偏好框架（7 維度）", PREF_SCORE_TEXT)
+    data = PREF_ROWS if PREF_ROWS else [
         ["偏好維度", "對客戶的含義", "現狀", "缺口"],
         ["權威信源", "需官方 / 高權重站點背書", "✓ 具備", "—"],
         ["知識圖譜", "品牌—產品—門市結構化", "△ 部分", "需建立"],
@@ -333,8 +353,7 @@ def build_deck(config, palette, output_path):
     table(s, Inches(0.8), Inches(1.55), Inches(11.7), Inches(5.0), data,
           [2.4, 4.6, 1.8, 2.9], fs=12, rh=0.55)
     txt(s, Inches(0.8), Inches(6.7), Inches(11.6), Inches(0.35),
-        "✓ 具備 / △ 部分 / ✗ 不足。結構化 FAQ 與簡中多語為最優先補強項，直接對應微盟星启「內容創作與改造優化」模塊。",
-        size=10.5, color=C["GRAY"])
+        PREF_FOOTNOTE, size=10.5, color=C["GRAY"])
 
     # ================================================================
     # Slide 10 — AIVO 評分卡 + 雷達圖
@@ -357,12 +376,16 @@ def build_deck(config, palette, output_path):
     chart.series[1].format.line.color.rgb = _cs1
     chart.series[1].format.line.width = Pt(2)
     chart.series[1].format.fill.solid(); chart.series[1].format.fill.fore_color.rgb = _cs1
-    aivo_notes = [
-        ("AI 搜索可見度", str(AIVO_VIS), "國內6平臺 %.2f" % CITE_RATE, C["AMBER"]),
-        ("基建完善度", str(AIVO_INFRA), "官網68+自媒體8+權威12", C["BLUE"]),
-        ("競爭優勢", str(AIVO_COMP), "利基定位，落後頭部", C["BLUE"]),
-        ("輿情健康度", str(AIVO_SENT), "負面率 ~2%（行業層級）", C["GREEN"]),
-    ]
+    if AIVO_NOTES:
+        aivo_notes = [(n, str(sc), note, (CM[col] if isinstance(col, str) else col))
+                      for n, sc, note, col in AIVO_NOTES]
+    else:
+        aivo_notes = [
+            ("AI 搜索可見度", str(AIVO_VIS), "國內6平臺 %.2f" % CITE_RATE, C["AMBER"]),
+            ("基建完善度", str(AIVO_INFRA), "官網68+自媒體8+權威12", C["BLUE"]),
+            ("競爭優勢", str(AIVO_COMP), "利基定位，落後頭部", C["BLUE"]),
+            ("輿情健康度", str(AIVO_SENT), "負面率 ~2%（行業層級）", C["GREEN"]),
+        ]
     y = Inches(1.7)
     for name, sc, note, col in aivo_notes:
         rect(s, Inches(7.2), y, Inches(5.3), Inches(1.12), fill=C["WHITE"], line=col, line_w=1.5, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
@@ -389,18 +412,17 @@ def build_deck(config, palette, output_path):
         txt(s, x + Inches(0.25), Inches(3.7), cw - Inches(0.5), Inches(2.3), body, size=13, color=C["INK"])
         x += cw + Inches(0.35)
     txt(s, Inches(0.8), Inches(6.5), Inches(11.6), Inches(0.4),
-        "基建總評：官方站 + 權威媒體已具基礎，但「國內自媒體缺位」與「可被 AI 引用的簡中結構化深度」不足——正是微盟星启內容改造的切入點。",
-        size=11.5, color=C["INK"])
+        INFRA_FOOTNOTE, size=11.5, color=C["INK"])
 
     # ================================================================
     # Slide 12 — 輿情風險監控
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "輿情風險監控（SENTIMENT）", f"健康度 {AIVO_SENT} · 低風險 · 趨勢穩定")
+    header(s, "輿情風險監控（SENTIMENT）", f"健康度 {AIVO_SENT} · {SENTIMENT_HEAD_SUFFIX}")
     rect(s, Inches(0.8), Inches(1.6), Inches(4.0), Inches(2.4), fill=C["NAVY"], shape=MSO_SHAPE.ROUNDED_RECTANGLE)
     txt(s, Inches(0.8), Inches(1.8), Inches(4.0), Inches(0.5), "輿情健康度", size=16, color=C["CYAN"], bold=True, align=PP_ALIGN.CENTER)
     txt(s, Inches(0.8), Inches(2.25), Inches(4.0), Inches(1.0), str(AIVO_SENT), size=60, color=C["WHITE"], bold=True, align=PP_ALIGN.CENTER, font=FNUM)
-    txt(s, Inches(0.8), Inches(3.35), Inches(4.0), Inches(0.5), "負面率 ~2%（3/150）· 低風險", size=12.5, color=C["WHITE"], align=PP_ALIGN.CENTER)
+    txt(s, Inches(0.8), Inches(3.35), Inches(4.0), Inches(0.5), SENTIMENT_RATE_NOTE, size=12.5, color=C["WHITE"], align=PP_ALIGN.CENTER)
     rect(s, Inches(5.1), Inches(1.6), Inches(7.4), Inches(5.0), fill=C["WHITE"], line=C["BLUE"], line_w=1.0, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
     txt(s, Inches(5.35), Inches(1.8), Inches(7.0), Inches(0.5), "監測發現與風險清單", size=16, color=C["BLUE"], bold=True)
     bullets(s, Inches(5.35), Inches(2.4), Inches(7.0), Inches(2.0), SENTIMENT_BULLETS, size=12.5, gap=7)
@@ -429,7 +451,7 @@ def build_deck(config, palette, output_path):
     data2 = [["品牌", "總提及", "評價"]]
     for name, cnt, note in COMPETITORS:
         data2.append([name, cnt, note])
-    data2.append([BRAND_CN + "（本）", str(CITED), "長尾，利基定位"])
+    data2.append([BRAND_CN + "（本）", str(CITED), BRAND_POSITION_NOTE])
     table(s, Inches(0.8), Inches(4.65), Inches(11.7), Inches(2.2), data2, [4.4, 2.6, 4.7], fs=12, rh=0.42)
 
     # ================================================================

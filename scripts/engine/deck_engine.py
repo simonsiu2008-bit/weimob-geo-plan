@@ -244,7 +244,7 @@ def build_deck(config, palette, output_path):
     txt(s, Inches(1.05), Inches(1.7), Inches(5.2), Inches(0.5), "GEO 診斷引擎（AIVO 四維）", size=17, color=C["BLUE"], bold=True)
     bullets(s, Inches(1.05), Inches(2.35), Inches(5.3), Inches(2.0), [
         "AI 搜索可見性：常見問答覆蓋率 / 被引用率 / 推薦位佔比",
-        "基建完善度：官網 / 自媒體矩陣 / 權威媒體 / 結構化數據",
+        "基建完善度：官網 / 自媒體佈局 / 權威媒體 / 結構化數據",
         "競爭優勢：相對競品在 AI 生態的位置與差異化",
         "輿情健康度：正面 / 負面情緒與信息來源追蹤",
     ], size=13, gap=7)
@@ -255,7 +255,7 @@ def build_deck(config, palette, output_path):
         "④ 評分 + 建議",
     ], size=13, gap=6)
     rect(s, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.0), fill=C["NAVY"], shape=MSO_SHAPE.ROUNDED_RECTANGLE)
-    txt(s, Inches(7.05), Inches(1.7), Inches(5.2), Inches(0.5), "微盟星启 GEO 全鏈方案", size=17, color=C["CYAN"], bold=True)
+    txt(s, Inches(7.05), Inches(1.7), Inches(5.2), Inches(0.5), "微盟星启 GEO 全流程方案", size=17, color=C["CYAN"], bold=True)
     bullets(s, Inches(7.05), Inches(2.35), Inches(5.3), Inches(1.7), [
         "智能診斷 → 內容優化 → 全域分發 → 持續監測",
         "四大能力模塊：AI 可見性監測 / 品牌輿情指數監測",
@@ -310,7 +310,7 @@ def build_deck(config, palette, output_path):
     table(s, Inches(0.8), Inches(1.6), Inches(11.7), Inches(5.0), QA_GRAPH,
           [1.4, 4.6, 2.2, 3.5], fs=12.5, rh=0.62)
     txt(s, Inches(0.8), Inches(6.75), Inches(11.6), Inches(0.35),
-        f"來源：微盟星启問答提取（15 組高頻問句 × 國內 6 平臺檢索）。海外版問答以英文口徑規劃。", size=9.5, color=C["GRAY"])
+        f"來源：微盟星启問答提取（15 組高頻問句 × 國內 6 平臺檢索）。海外版問答以英文說法規劃。", size=9.5, color=C["GRAY"])
 
     # ================================================================
     # Slide 7 — 高頻問題被提及次數（客戶核心關切）
@@ -363,7 +363,7 @@ def build_deck(config, palette, output_path):
     chart_data = CategoryChartData()
     chart_data.categories = ["AI可見度", "基建完善度", "競爭優勢", "輿情健康度"]
     chart_data.add_series("本品牌", (AIVO_VIS, AIVO_INFRA, AIVO_COMP, AIVO_SENT))
-    chart_data.add_series("行業基準", tuple(AIVO_BENCH))
+    chart_data.add_series("行業平均", tuple(AIVO_BENCH))
     gf = s.shapes.add_chart(XL_CHART_TYPE.RADAR, Inches(0.7), Inches(1.6), Inches(6.2), Inches(5.0), chart_data)
     chart = gf.chart
     chart.has_title = False; chart.has_legend = True
@@ -458,7 +458,7 @@ def build_deck(config, palette, output_path):
     # Slide 15 — 對手在 AI 平臺的做法（客戶核心關切）
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "對手在 AI 平臺的做法 · 競品基準", "他們如何佔住 AI 回答 · 本品牌可借鏡之處")
+    header(s, "對手在 AI 平臺的做法 · 競品對照", "他們如何佔住 AI 回答 · 本品牌可借鏡之處")
     rect(s, Inches(0.8), Inches(1.6), Inches(6.6), Inches(5.0), fill=C["WHITE"], line=C["BLUE"], line_w=1.0, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
     txt(s, Inches(1.05), Inches(1.8), Inches(6.1), Inches(0.5), "對手在 AI 平臺的佔位套路", size=16, color=C["BLUE"], bold=True)
     bullets(s, Inches(1.05), Inches(2.4), Inches(6.1), Inches(4.0), [
@@ -482,7 +482,7 @@ def build_deck(config, palette, output_path):
     # Slide 17 — 微盟星启 GEO 能力映射
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "微盟星启 GEO 能力映射", "問題 → 模塊 → 指標（數據追蹤閉環）")
+    header(s, "微盟星启 GEO 能力映射", "問題 → 模塊 → 指標（每一步都有數跟）")
     data = [["優化問題", "對應模塊", "追蹤指標", "優先級"]] + CAPABILITY_MAP
     table(s, Inches(0.8), Inches(1.6), Inches(11.7), Inches(4.6), data, [2.7, 3.5, 3.7, 1.0], fs=11.5, rh=0.6)
     txt(s, Inches(0.8), Inches(6.45), Inches(11.6), Inches(0.4),
@@ -493,7 +493,7 @@ def build_deck(config, palette, output_path):
     # Slide 18 — 數據追蹤方案
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "數據追蹤方案", "話題詞 / 平臺雙版本 / 媒體矩陣 / 基線目標")
+    header(s, "數據追蹤方案", "話題詞 / 平臺雙版本 / 媒體佈局 / 現狀目標")
     rect(s, Inches(0.8), Inches(1.55), Inches(5.6), Inches(2.0), fill=C["WHITE"], line=C["BLUE"], line_w=1.0, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
     txt(s, Inches(1.0), Inches(1.7), Inches(5.2), Inches(0.4), "核心話題詞（來自問答圖譜）", size=14, color=C["BLUE"], bold=True)
     bullets(s, Inches(1.0), Inches(2.2), Inches(5.2), Inches(1.3), TOPIC_WORDS, size=12, gap=5)
@@ -501,9 +501,9 @@ def build_deck(config, palette, output_path):
     txt(s, Inches(6.8), Inches(1.7), Inches(5.5), Inches(0.4), "目標平臺雙版本", size=14, color=C["CYAN"], bold=True)
     txt(s, Inches(6.8), Inches(2.2), Inches(5.5), Inches(0.5), "國內版 6（主）：豆包/DeepSeek/阿里千問/百度AI/元寶/Kimi", size=12, color=C["WHITE"])
     txt(s, Inches(6.8), Inches(2.75), Inches(5.5), Inches(0.5), "海外版 5（輔）：ChatGPT/Perplexity/Claude/Gemini/Copilot", size=12, color=C["WHITE"])
-    txt(s, Inches(0.8), Inches(3.75), Inches(11.6), Inches(0.4), "基線 → 目標（可被引用率 / 覆蓋）", size=14, color=C["BLUE"], bold=True)
+    txt(s, Inches(0.8), Inches(3.75), Inches(11.6), Inches(0.4), "現狀 → 目標（可被引用率 / 覆蓋）", size=14, color=C["BLUE"], bold=True)
     table(s, Inches(0.8), Inches(4.05), Inches(11.7), Inches(2.4), KPI_ROWS, [4.4, 2.6, 2.6, 2.6], fs=12, rh=0.46)
-    _comp_note = "海外版目標以 Phase1 診斷評估建立基線後滾動設定（本報告為規劃視角，不預設百分比）。"
+    _comp_note = "海外版目標以 Phase1 診斷評估先摸底後滾動設定（本報告為規劃視角，不預設百分比）。"
     if COMPLIANCE.get("applicable"):
         _comp_note += " · 合規紅線：受限行業內容僅作成分/正品/品質/選購科普，不作功效聲稱（詳見話題詞方案）。"
     txt(s, Inches(0.8), Inches(6.6), Inches(11.6), Inches(0.35), _comp_note, size=9.5, color=C["GRAY"])
@@ -512,7 +512,7 @@ def build_deck(config, palette, output_path):
     # Slide 19 — 實施節奏與追蹤指標
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, "實施節奏與追蹤指標", "對齊微盟星启五步標準服務流程")
+    header(s, "實施節奏與追蹤指標", "按微盟星启五步標準服務流程")
     steps = [("1", "診斷評估"), ("2", "優化策略定制"), ("3", "執行上線"), ("4", "效果監控"), ("5", "持續優化")]
     n = len(steps); gap = Inches(0.3)
     cw = (SW - Inches(1.6) - gap * (n - 1)) / n

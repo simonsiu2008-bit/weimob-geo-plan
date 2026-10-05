@@ -11,7 +11,7 @@ build_topic_html(topic_config, output_path)  →  生成「国内版 GEO 话题�
 每个案例的话题词方案独立生成、独立输出到自己的 output/ 目录。
 
 渲染固定框架（不可改动，微盟四色 + 微軟雅黑）：
-- L1/L2/L3 话题框架 + 20 题监测池 + 五问测试 + 合规校验 + 落地节奏
+- L1/L2/L3 话题框架 + 20 题监测池 + 五问测试 + 合规核对 + 落地节奏
 - 受监管品类（COMPLIANCE.applicable=True）才显示合规横幅与禁用词提示
 - 依赖：无第三方库（纯标准库）。
 """
@@ -176,7 +176,7 @@ def render_map(tc):
     return f"""
 <section style="padding-top:0"><div class="wrap">
   <div class="secHead"><span class="secNum">02</span><h2>话题三层结构</h2></div>
-  <div class="secDesc">单一话题只能测出一个分数，测不出打法。三层结构分别解决「排名在哪」「新客从哪来」「为什么敢买」三个问题。所有话题的内容均限定在「成分 / 正品 / 品质 / 选购」边界内。</div>
+  <div class="secDesc">单一话题只能测出一个分数，测不出做法。三层结构分别解决「排名在哪」「新客从哪来」「为什么敢买」三个问题。所有话题的内容均限定在「成分 / 正品 / 品质 / 选购」边界内。</div>
   <div class="map">{cols}</div>
 </div></section>"""
 
@@ -208,7 +208,7 @@ def render_topics(tc):
     return f"""
 <section style="padding-top:0"><div class="wrap">
   <div class="secHead"><span class="secNum">03</span><h2>五个话题 · 逐个拆解</h2></div>
-  <div class="secDesc">每个话题都给出：AI 当前实际召回的竞品、品牌所处位置、合规版内容处方、投放平台、以及现场可用的一句话说法。所有内容处方均不含功能 / 功效声称。</div>
+  <div class="secDesc">每个话题都给出：AI 现在实际点到名的竞品、品牌所处位置、合规版内容处方、投放平台、以及现场可用的一句话说法。所有内容处方均不含功能 / 功效声称。</div>
   {cards}
 </div></section>"""
 
@@ -227,21 +227,21 @@ def render_pool(tc):
   <div class="secHead"><span class="secNum">04</span><h2>监测问题池 · {n} 条</h2></div>
   <div class="secDesc">全部为纯品类词 / 场景词，零品牌名。含品牌名的问题会让 AI 必然答出品牌，导致可见度虚高、无法与行业对标。
     {n} 条 × 国内 {np_} 平台 = <b>{n * np_} 个可监测场景</b>。右侧「我方内容边界」列明每个问题对应的内容红线——我们只监测竞品怎么说，自己绝不跟着声称功效。</div>
-  <table><thead><tr><th style="width:4%">#</th><th style="width:18%">所属话题</th><th style="width:34%">监测问句（简体中文 · 内地用户口径）</th><th style="width:10%">意图类型</th><th style="width:34%">我方内容边界</th></tr></thead>
+  <table><thead><tr><th style="width:4%">#</th><th style="width:18%">所属话题</th><th style="width:34%">监测问句（简体中文 · 内地用户问法）</th><th style="width:10%">意图类型</th><th style="width:34%">我方内容边界</th></tr></thead>
   <tbody>{rows}</tbody></table>
-  <div class="note">监测平台（国内版 {np_} · 主）：{platforms}。每月同口径复测一次，产出「话题可见度趋势 + 竞品排名变化」双曲线。
+  <div class="note">监测平台（国内版 {np_} · 主）：{platforms}。每月用同一批问题复测一次，产出「话题可见度趋势 + 竞品排名变化」双曲线。
     <b style="color:var(--red)">红线重申：</b>问题池用于「监测竞品说了什么」，我方据此生产的内容一律守法——只做成分 / 正品 / 品质 / 选购科普，绝不作功能功效声称。</div>
 </div></section>"""
 
 
 def render_tests(tc):
     tests = [
-        ("TEST 01", "竞品召回", "用该话题问 AI，能否稳定返回 ≥5 个品牌名？返回不了就产不出排名，话题作废。"),
-        ("TEST 02", "品牌纯净", "话题及派生问题不得含自家品牌名。含了会让可见度虚高，且无法与竞品同口径对比。"),
-        ("TEST 03", "叙事一致", "AI 在该话题下的回答语境，是否与品牌核心叙事同一语义场？不同源 = 你是外来户，投产比极低。"),
+        ("TEST 01", "竞品点名", "用该话题问 AI，能否稳定返回 ≥5 个品牌名？返回不了就产不出排名，话题作废。"),
+        ("TEST 02", "品牌纯净", "话题及派生问题不得含自家品牌名。含了会让可见度虚高，且无法与竞品在同一标准下对比。"),
+        ("TEST 03", "叙事一致", "AI 在该话题下的回答，说的东西是否与品牌主线一致？不一致 = 你是外来户，投产比极低。"),
         ("TEST 04", "意图深度", "话题落在决策链哪一环？科普层 &lt; 对比层 &lt; 选购层。纯科普型话题商业价值低。"),
         ("TEST 05", "内容可执行", "能否直接翻译成「写什么文 + 发哪个平台」？翻译不出来的话题，监测了也无法优化。"),
-        ("TEST 06", "合规校验", "该话题下我方要发的内容，能否不写任何功效仍成立？落不了地（必须声称功效才能赢）的话题，对受限行业是雷区，弃用或换角度。"),
+        ("TEST 06", "合规核对", "该话题下我方要发的内容，能否不写任何功效仍成立？落不了地（必须声称功效才能赢）的话题，对受限行业是雷区，弃用或换角度。"),
     ]
     cells = ""
     for n, h, p in tests:
@@ -250,8 +250,8 @@ def render_tests(tc):
         cells += f'<div class="test" {accent}><div class="n" {ncolor}>{n}</div><h4>{_esc(h)}</h4><p>{_esc(p)}</p></div>'
     return f"""
 <section style="padding-top:0"><div class="wrap">
-  <div class="secHead"><span class="secNum">05</span><h2>话题词五问测试 + 合规校验</h2></div>
-  <div class="secDesc">上述话题均通过以下全部测试与合规校验。这套测试可复用于任何品牌 —— 也是判断一个话题「值不值得投钱」的标准。</div>
+  <div class="secHead"><span class="secNum">05</span><h2>话题词五问测试 + 合规核对</h2></div>
+  <div class="secDesc">上述话题均通过以下全部测试与合规核对。这套测试可复用于任何品牌 —— 也是判断一个话题「值不值得投钱」的标准。</div>
   <div class="tests">{cells}</div>
 </div></section>"""
 
@@ -268,7 +268,7 @@ def render_steps(tc):
     return f"""
 <section style="padding-top:0"><div class="wrap">
   <div class="secHead"><span class="secNum">06</span><h2>话题落地节奏</h2></div>
-  <div class="secDesc">先建基线，再打增量，最后固化。每阶段都有可复测的数字，且全程守住合规红线。</div>
+  <div class="secDesc">先测出现状，再一格格往上推，最后稳住。每阶段都有可复测的数字，且全程守住合规红线。</div>
   <div class="steps">{cells}</div>
 </div></section>"""
 
@@ -290,8 +290,8 @@ def render_footer(tc):
     return f"""
 <footer><div class="wrap">
   <strong>微盟星启 GEO 运营团队</strong>
-  国内版 {len(tc['PLATFORMS'])} 平台：{platforms}　·　话题可见度与竞品排名按统一口径每月复测<br>
-  {cite_line}本方案中「AI 当前召回的竞品池」与「AI 叙事风险」均来自国内公开检索的实际返回内容；话题可见度数值需按本页口径完成基线跑测后填入。<br>
+  国内版 {len(tc['PLATFORMS'])} 平台：{platforms}　·　话题可见度与竞品排名按统一标准每月复测<br>
+  {cite_line}本方案中「AI 当前召回的竞品池」与「AI 叙事风险」均来自国内公开检索的实际返回内容；话题可见度数值需按本页方法完成现状摸底后填入。<br>
   {comp_line}
 </div></footer>"""
 
@@ -329,7 +329,7 @@ def build_topic_html(tc):
         {rank_card}
       </div>"""
 
-    formula = (f'计算口径统一：<code>话题可见度 = 命中该话题的场景数 ÷ 该话题场景总数 × 100%</code>'
+    formula = (f'计算方法统一：<code>话题可见度 = 命中该话题的场景数 ÷ 该话题场景总数 × 100%</code>'
                f'　·　场景数 = 问题数 × 平台数　·　全部问题不含品牌名，确保数据可对标、可复测')
     if tc.get("VIS_DUAL"):
         vd = tc["VIS_DUAL"]
@@ -344,7 +344,7 @@ def build_topic_html(tc):
         <div class="eyebrow">微盟星启 GEO · 国内版</div>
         <h1>国内版 GEO<br><em>话题词方案</em></h1>
         <div class="sub">{_esc(brand)} ｜ {_esc(sub)}<br>
-          话题词决定分母、竞品池与优化方向。本方案的 {n_topic} 个话题全部经过真实召回验证，非经验推测。</div>
+          话题词决定分母、竞品池与优化方向。本方案的 {n_topic} 个话题全部经过真实点名验证，非经验推测。</div>
       </div>
       <div style="padding-bottom:34px">{hero_stats}</div>
     </div></div>

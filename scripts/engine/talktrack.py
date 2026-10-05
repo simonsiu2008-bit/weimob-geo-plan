@@ -16,7 +16,7 @@ build_talktrack(config, topic_config, palette, output_path)  →  生成 .md
 本引擎按 CONFIG 自动推断：
   · 20 页逐页讲稿骨架（每页该讲什么、重点强调哪个数）
   · 销售开场 / 报价 / 异议处理 / 收尾话术
-  · 可引用的硬数据清单（AIVO、被引用率、竞品池、排名锚点、信源榜）
+  · 可引用的硬数据清单（AIVO、被引用率、竞品池、排名参照、信源榜）
   · 合规红线（COMPLIANCE.applicable=True 时）
 依赖：无第三方库。
 """
@@ -39,7 +39,7 @@ def _page_script(c, topic_cfg):
     rows.append((
         2, "執行摘要",
         f"直接抛 AIVO 总分 {c['AIVO_TOTAL']}（{c['AIVO_RATE']}）。"
-        f"四个维度拆开看：AI 可见度 {c['AIVO_VIS']}、基建 {c['AIVO_INFRA']}、竞争 {c['AIVO_COMP']}、舆情 {c['AIVO_SENT']}。"
+        f"四个方面分开看：AI 可见度 {c['AIVO_VIS']}、基建 {c['AIVO_INFRA']}、竞争 {c['AIVO_COMP']}、舆情 {c['AIVO_SENT']}。"
         f"关键发现共 {len(c['KEY_FINDINGS'])} 条，重点讲『被引用率 {c['CITE_RATE']}，行业头部 0.70，差距明确』这一条最有体感。",
         [f"AIVO {c['AIVO_TOTAL']}", f"被引用率 {c['CITE_RATE']}", "关键发现"]))
     rows.append((
@@ -78,19 +78,19 @@ def _page_script(c, topic_cfg):
         ["信源类型", "缺失项（机会）",
          ("信源引用榜" if c.get("SOURCE_CITE") else None)]))
     rows.append((
-        9, "引用偏好框架（7 維度）",
-        "讲 AI 喜欢什么样的内容：权威信源、知识图谱、结构化 FAQ、数据证据、新鲜度、多语言、多模态。"
+        9, "引用偏好框架（7 個方面）",
+        "讲 AI 喜欢什么样的内容：权威来源、知识图谱、问答格式、数据证据、新鲜度、多语言、多模态。"
         "『结构化 FAQ 与简中多语是最优先补强项』——直接对应对客户的优化模块。",
-        ["7 维度", "优先补强：结构化FAQ"]))
+        ["7 个方面", "优先补强：问答格式"]))
     rows.append((
         10, "AIVO 四維評分卡",
-        f"总分 {c['AIVO_TOTAL']}。雷达图对比行业基准 {c['AIVO_BENCH']}。"
+        f"总分 {c['AIVO_TOTAL']}。雷达图对比行业平均 {c['AIVO_BENCH']}。"
         "讲法：总分看着一般，但拆分后能精准定位『哪一维在拖后腿、哪一维已是亮点』——这正是优化起点。",
-        [f"AIVO {c['AIVO_TOTAL']}", "vs 行业基准"]))
+        [f"AIVO {c['AIVO_TOTAL']}", "vs 行业平均"]))
     rows.append((
         11, "品牌基建診斷",
         f"三张基建卡：{c['INFRA_CARDS'][0][0]} {c['INFRA_CARDS'][0][1]} / {c['INFRA_CARDS'][1][0]} {c['INFRA_CARDS'][1][1]} / {c['INFRA_CARDS'][2][0]} {c['INFRA_CARDS'][2][1]}。"
-        "讲法：官方站+权威媒体已有基础，但『国内自媒体缺位 + 简中结构化深度不足』是切入机会。",
+        "讲法：官方站+权威媒体已有基础，但『国内自媒体缺位 + 简体中文深度内容不足』是切入机会。",
         ["官网站点评分", "自媒体缺口（最大短板）"]))
     rows.append((
         12, "輿情風險監控",
@@ -122,11 +122,11 @@ def _page_script(c, topic_cfg):
     rows.append((
         17, "微盟星启 GEO 能力映射",
         "把问题映射到微盟星启四大能力模块（AI 可见性监测 / 舆情指数 / 内容创作优化 / 智能媒体分发），"
-        "每一条都配可追踪指标——证明服务不是『卖概念』而是『卖可量化的闭环』。",
-        ["四大能力模块", "指标闭环"]))
+        "每一条都配可追踪指标——证明服务不是『卖概念』而是『卖可量化的结果』。",
+        ["四大能力模块", "每个指标跟到底"]))
     rows.append((
         18, "數據追蹤方案",
-        f"核心话题词 {len(c['TOPIC_WORDS'])} 条 + 平台双版本 + KPI 基线→目标（被引用率 {c['KPI_ROWS'][1][1]}→{c['KPI_ROWS'][1][3]}）。"
+        f"核心话题词 {len(c['TOPIC_WORDS'])} 条 + 平台双版本 + KPI 现状→目标（被引用率 {c['KPI_ROWS'][1][1]}→{c['KPI_ROWS'][1][3]}）。"
         + (f"合规红线：受限行业仅做成分/正品/品质/选购科普，不作功效声称。" if comp_applicable else ""),
         ["话题词", "KPI 目标", ("合规红线" if comp_applicable else None)]))
     rows.append((
@@ -136,7 +136,7 @@ def _page_script(c, topic_cfg):
         ["五步流程", "P1/P2/P3 节奏"]))
     rows.append((
         20, "結尾",
-        "收尾给联系方式 + 行动号召：约下一次诊断基线跑测。"
+        "收尾给联系方式 + 行动号召：约下一次现状摸底。"
         f"联系方式：{c['CONTACT'][0]}。",
         ["联系方式", "行动号召"]))
 
@@ -152,21 +152,21 @@ def _sales_lines(c, topic_cfg):
         f"发现 AI 平均只在你 {c['CITE_RATE']:.0%} 次会提到你。剩下 {int((1 - c['CITE_RATE']) * 100)}% 的新客，"
         "根本不知道你的存在。这不是产品问题，是 AI 内容在场率问题——今天我就告诉你答案在哪里。』"))
     if c.get("RANK_POOL"):
-        lines.append(("报价锚点（最有感的一个数）",
+        lines.append(("报价参照（最有感的一个数）",
             f"『品类话题竞品池 {c['RANK_POOL']['total']} 个品牌，你排 #{c['RANK_POOL']['rank']}。"
             "这个排名每个月都能复测——它涨了，说明钱花对了。』"))
     lines.append(("异议处理 · 预算",
         "『这笔投入不是广告费，是内容资产。广告停了就没有了，而这篇内容只要被 AI 收录，就会持续被引用。"
         f"现在你每 100 次相关提问只有 {int(c['CITE_RATE']*100)} 次被看见，补到位后这个数字是可量化提升的。』"))
     lines.append(("异议处理 · 周期",
-        "『第一阶段 1–2 周先建基线，把『现在排第几』这个数字测出来；90 天看第一次进榜，180 天看排名进入行业前十。每一步都有可复测的指标，不是空头支票。』"))
+        "『第一阶段 1–2 周先做一次现状摸底，把『现在排第几』测出来；90 天看第一次进榜，180 天看排名进入行业前十。每一步都有可复测的指标，不是空头支票。』"))
     if comp.get("applicable"):
-        lines.append(("合规口径（受监管品类必读）",
+        lines.append(("合规说法（受监管品类必读）",
             f"『客户是受限行业（{comp.get('industry','')}），内容只能做成分事实、正品辨别、品质认证、选购方法四件事，"
             "全程不碰功效声称。这不是限制，反而是差异化——竞品只能打功效牌，我们用原装与品质的硬事实建立信任，且完全合法。』"))
     lines.append(("收尾行动号召",
-        "『下一步我安排一次 20 问 × 6 平台的诊断基线跑测，出一份带行业排名的话题基线报告。"
-        f"拿到基线后我们再定 90 天目标。联系方式：{c['CONTACT'][0]}。』"))
+        "『下一步我安排一次 20 问 × 6 平台的现状摸底，出一份带行业排名的话题现状报告。"
+        f"拿到摸底结果后我们再定 90 天目标。联系方式：{c['CONTACT'][0]}。』"))
     return lines
 
 
@@ -180,7 +180,7 @@ def build_talktrack(config, topic_config=None, palette_name="weimob_blue", outpu
     md = []
     md.append(f"# {c['BRAND_CN']} · 微盟星启 GEO 销售话术 / 讲稿")
     md.append("")
-    md.append(f"> **内部资料，仅限销售使用 · 不进入客户版 PPT**　·　口径：{c['DIAG']}")
+    md.append(f"> **内部资料，仅限销售使用 · 不进入客户版 PPT**　·　说明：{c['DIAG']}")
     md.append("")
     md.append(f"- 客户定位：{c['CLIENT_DESC']}")
     md.append(f"- 主营品类：{c['PRODUCT_TYPE']}")
@@ -209,7 +209,7 @@ def build_talktrack(config, topic_config=None, palette_name="weimob_blue", outpu
     if c.get("VIS_DUAL"):
         md.append(f"| 可见度双指标 | 品牌词 {c['VIS_DUAL']['brand_word']:.0%} / 品类词 {c['VIS_DUAL']['category_word']:.0%} | 指名你在、陌生人不认识你 |")
     if c.get("RANK_POOL"):
-        md.append(f"| 品类排名锚点 | #{c['RANK_POOL']['rank']} / {c['RANK_POOL']['total']} | 每月可复测，涨了=钱花对 |")
+        md.append(f"| 品类排名参照 | #{c['RANK_POOL']['rank']} / {c['RANK_POOL']['total']} | 每月可复测，涨了=钱花对 |")
     if c.get("SOURCE_CITE"):
         md.append(f"| 信源引用榜 | {' / '.join(f'{n} {s}' for n, s in c['SOURCE_CITE'][:3])} | 上榜信源=AI 取材来源 |")
     md.append("")

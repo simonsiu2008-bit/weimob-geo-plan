@@ -204,6 +204,32 @@ def run_qa(case_name, cases_dir="cases", extra_pollute=(), must_words=(),
             else:
                 p("✓ 话题词 HTML 合规功效词 0 处非否定语境")
 
+    # 9. 術語白話化（2026-10-05 客戶反饋「還是在用基准线什麼的國內術語」）
+    #    L1 黑話必須 0 命中；L2 框架詞保留專業感，僅統計不判失敗。
+    try:
+        from jargon import scan as _scan_jargon
+    except ImportError:
+        import sys as _sys
+        _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from jargon import scan as _scan_jargon
+
+    jtargets = [("PPT", full)]
+    if html_path:
+        jtargets.append(("話題詞 HTML", io.open(html_path, encoding="utf-8").read()))
+    for fn in sorted(os.listdir(out_dir)):
+        if fn.lower().endswith(".md"):
+            jtargets.append((fn, io.open(os.path.join(out_dir, fn), encoding="utf-8").read()))
+
+    jfail = 0
+    for label, txt in jtargets:
+        r = _scan_jargon(txt)
+        if r["l1_total"]:
+            p(f"✗ {label} 術語未白話化（L1 黑話）：{r['l1_hits']}"); jfail += 1
+    if jfail == 0:
+        l2t = sum(_scan_jargon(t)["l2_total"] for _, t in jtargets)
+        p(f"✓ 術語白話化 0 命中（L1 黑話）；L2 框架詞 {l2t} 處（保留專業感，僅統計）")
+    fail += jfail
+
     p("===> %s" % ("ALL PASS" if fail == 0 else "FAIL %d 项" % fail))
     return (fail, L)
 

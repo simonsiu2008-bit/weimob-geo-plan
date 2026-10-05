@@ -46,6 +46,19 @@ PALETTES = {
         "font_numeral": "JetBrains Mono",
         "chart_series": ["#16706A", "#0F4A46"],
     },
+    "ori_warm": {
+        "name": "ORI 暖木橙",
+        "colors": {
+            # 家居 / 定制家具 / 生活方式品牌 → ORI 品牌橙 + 暖木調
+            "BLUE": "#C46A1F", "NAVY": "#4A2E14", "CYAN": "#8A9A5B",
+            "CLOUD": "#FAF7F2", "INK": "#2B2118", "GRAY": "#6E655C",
+            "WHITE": "#FFFFFF", "GREEN": "#4E7A46", "AMBER": "#B5793A",
+            "RED": "#B0453A", "LIGHTBLUE": "#F3E5D3",
+        },
+        "font": "微軟雅黑",
+        "font_numeral": "Arial",
+        "chart_series": ["#C46A1F", "#4A2E14"],
+    },
     "heritage_green": {
         "name": "自然保育綠",
         "colors": {

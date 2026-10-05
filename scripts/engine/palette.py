@@ -10,6 +10,9 @@ Palette 数据模型 + 预设主题
 预设：
 - weimob_blue   : 微盟商务蓝（默认 / 通用 B2B / 科技 / 零售）
 - meiriki_teal  : 日式健康青（保健品 / 健康食品 / 中老年营养 / 母婴）
+- xiaomi_orange : 科技橙（智能硬件 / 消费科技）
+- heritage_green: 自然保育綠（文化遺產 / 生態旅遊 / 歷史活化）
+- ori_warm      : ORI 暖木橙（家居 / 定制家具 / 生活方式）
 扩展：新品类按 references/design_system.md 决策规则创建自定义 palette。
 """
 from pptx.dml.color import RGBColor
@@ -71,6 +74,19 @@ PALETTES = {
         "font": "Noto Sans CJK SC",
         "font_numeral": "Arial",
         "chart_series": ["#3E7C4F", "#B07B4A"],
+    },
+    "ori_warm": {
+        "name": "ORI 暖木橙",
+        "colors": {
+            # 家居 / 定制家具 / 生活方式品牌 → ORI 品牌橙 + 暖木調
+            "BLUE": "#C46A1F", "NAVY": "#4A2E14", "CYAN": "#8A9A5B",
+            "CLOUD": "#FAF7F2", "INK": "#2B2118", "GRAY": "#6E655C",
+            "WHITE": "#FFFFFF", "GREEN": "#4E7A46", "AMBER": "#B5793A",
+            "RED": "#B0453A", "LIGHTBLUE": "#F3E5D3",
+        },
+        "font": "微軟雅黑",
+        "font_numeral": "Arial",
+        "chart_series": ["#C46A1F", "#4A2E14"],
     },
 }
 

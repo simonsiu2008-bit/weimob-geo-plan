@@ -315,8 +315,10 @@ python3 scripts/build_talktrack.py cases/<name>
 ### Step 7 — QA（交付前必做）
 ```bash
 python3 scripts/check_lang_parity.py        # ① 語言包鍵集一致性（新增語言包/改版必跑）
-python3 scripts/qa_check.py <case>          # ② 交付物 QA（逐份掃描 output/ 全部 pptx + html）
+python3 scripts/qa_check.py <case>          # ② 交付物 QA（逐份掃描 output/ 全部 pptx + html + md）
 ```
+QA 第 8 項為**術語白話化**：`engine/jargon.py` 掃 L1 內地黑話（基線／口徑／閉環／矩陣／對齊／錨點…），
+交付物命中數**必須為 0**；L2 框架詞（AIVO／召回／收錄…）保留專業感，僅統計。新客戶專有術語可入 `JARGON_ALLOW` 白名單。
 **第 ① 道門**：三個註冊表（`TOPIC_LANG` / `DECK_LANG` / `TT_LANG`）任意兩個語言包的
 鍵集、版本分支鍵（domestic/overseas/both）集合必須完全一致——不一致即渲染時 KeyError，必須先修。
 
@@ -367,7 +369,8 @@ python3 scripts/qa_check.py <case>          # ② 交付物 QA（逐份掃描 ou
 - `topic_engine.py` — 話題詞方案 HTML 渲染核心，`build_topic_html(topic_config)`；內置 classic 與
   歸藏卡片風（暗底玻璃卡片）兩套 CSS。
 - `talktrack.py` — 銷售話術/講稿生成核心，`build_talktrack(config, topic_config, out, lang_style)`。
-- `qa_engine.py` — 交付前 QA，`run_qa(case, ...)` 含跨 case 自動反查；掃描 output/ 全部 pptx/html。
+- `qa_engine.py` — 交付前 QA，`run_qa(case, ...)` 含跨 case 自動反查；掃描 output/ 全部 pptx/html/md。
+- `jargon.py` — 術語白話化字典與掃描器（L1 黑話必換 / L2 框架詞保留 / `JARGON_ALLOW` 白名單）；供 QA 硬性檢查。
 - `evidence_engine.py` — 證據渲染核心，兩個出入口：
   `build_evidence_cards(cfg)`（痛點問答卡，讀 `evidence_config.py`）/
   `build_evidence_html(ec)`（AI 實測報告，讀 `evidence/manifest.json` + 截圖）。

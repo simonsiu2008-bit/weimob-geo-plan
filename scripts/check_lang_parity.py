@@ -49,7 +49,7 @@ def check_registry(name, table, verbose=False):
     sets = {k: set(table[k].keys()) for k in pkgs}
     base_name = pkgs[0]
     base = sets[base_name]
-    lines.append(f"  {name}: 语言包 {pkgs}（基准 {base_name}，{len(base)} 键）")
+    lines.append(f"  {name}: 语言包 {pkgs}（以 {base_name} 為參照，{len(base)} 键）")
 
     for k in pkgs[1:]:
         only_base = base - sets[k]

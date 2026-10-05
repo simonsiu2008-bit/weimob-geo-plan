@@ -21,7 +21,7 @@ build_talktrack(config, topic_config, palette, output_path, lang_style)  →  �
 本引擎按 CONFIG 自动推断：
   · 20 页逐页讲稿骨架（每页该讲什么、重点强调哪个数）
   · 销售开场 / 报价 / 异议处理 / 收尾话术
-  · 可引用的硬数据清单（AIVO、被引用率、竞品池、排名锚点、信源榜）
+  · 可引用的硬数据清单（AIVO、被引用率、竞品池、排名参照、信源榜）
   · 合规红线（COMPLIANCE.applicable=True 时）
 依赖：无第三方库。
 """
@@ -54,6 +54,8 @@ def _page_script(c, tc, T):
     common = dict(
         total=c["AIVO_TOTAL"], cite=c["CITE_RATE"], gap=c["GAP_PCT"],
         sent=c["AIVO_SENT"],
+        # 「優秀線」基準個案化（v4 移植）：默認 0.70，案例可覆蓋
+        e=f"{float(c.get('EXCELLENT_LINE', 0.70)):.2f}",
     )
 
     kw = {
@@ -104,8 +106,8 @@ def _sales_lines(c, topic_cfg, T):
     rp = c.get("RANK_POOL")
     out = []
     # 语言包 sales 固定 6 条，按数据条件过滤出实际条目：
-    # 0 开场钩子 / 1 报价锚点（需 RANK_POOL）/ 2 预算 / 3 周期 /
-    # 4 合规口径（需 applicable）/ 5 收尾行动号召
+    # 0 开场钩子 / 1 报价参照（需 RANK_POOL）/ 2 预算 / 3 周期 /
+    # 4 合规说法（需 applicable）/ 5 收尾行动号召
     for idx, (title, body_t) in enumerate(T["sales"]):
         if idx == 1 and not rp:
             continue
@@ -173,7 +175,7 @@ def build_talktrack(config, topic_config=None, palette_name="weimob_blue",
     md.append("| " + " | ".join([
         DV("ver_row_cite")[0],
         DV("ver_row_cite")[1].format(rate=c["CITE_RATE"], cited=c["CITED"], total=c["TOTAL_SCEN"]),
-        DV("ver_row_cite")[2]]) + " |")
+        DV("ver_row_cite")[2].format(e=f"{float(c.get('EXCELLENT_LINE', 0.70)):.2f}")]) + " |")
     md.append("| " + " | ".join([
         T["row_gap"][0],
         T["row_gap"][1].format(pct=c["GAP_PCT"]),

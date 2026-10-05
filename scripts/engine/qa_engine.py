@@ -14,6 +14,7 @@ run_qa(case_name, cases_dir, extra_pollute=(), must_words=(), compliance=True)
   · 页数恰好 20        · 禁忌标记 0（虛擬/⚠️/website/{{）
   · 占位符 0           · 元素越界 OOB 0
   · 診斷模型估算 ≥ 2   · 合规功效词（受监管品类）仅出现在否定语境
+  · 術語白話化 L1 黑話 0 命中（見 jargon.py）
   · 双指标 / 排名锚点 / 信源榜 / 合规声明 在交付物中体现
 
 多版本并行（VISUAL_STYLES）：output/ 目录中的【全部】.pptx 与 .html 交付物
@@ -24,11 +25,21 @@ import io
 import json
 import os
 import re
+import sys
 
 try:
     from pptx import Presentation
 except ImportError:
     Presentation = None
+
+# 術語白話化字典（同目錄的 jargon.py）。L1 黑話命中數必須為 0；L2 框架詞僅統計。
+_ENGINE_DIR = os.path.dirname(os.path.abspath(__file__))
+if _ENGINE_DIR not in sys.path:
+    sys.path.insert(0, _ENGINE_DIR)
+try:
+    from jargon import scan as _jargon_scan
+except Exception:  # pragma: no cover - 缺模組時降級為告警，不阻塞 QA
+    _jargon_scan = None
 
 FORBIDDEN = ["實測", "虛擬", "\u26a0\ufe0f", "\u26a0", "website", "{{",
              "頭部競品 A", "頭部競品 B", "头部竞品 A", "头部竞品 B"]
@@ -69,6 +80,20 @@ def compliance_ok(text, is_html):
             if not any(k in ctx for k in NEG_CTX):
                 bad += 1
     return bad
+
+
+def jargon_line(text, tag=""):
+    """術語白話化检查：返回 (是否失败, 报告行)。
+
+    L1 = 内地互联网黑话（基线 / 口径 / 闭环 / 矩阵 / 锚点…），客户老闆看不懂，
+    命中数必须为 0；L2 = GEO 框架词（AIVO / 召回 / 收录…），保留专业感，仅统计。
+    """
+    if _jargon_scan is None:
+        return (False, f"⚠ 術語白話化检查跳过（未找到 jargon 模組）{tag}")
+    r = _jargon_scan(text)
+    if r["l1_total"]:
+        return (True, f"✗ 術語白話化 L1 黑話 {r['l1_total']} 命中：{r['l1_hits']}{tag}")
+    return (False, f"✓ 術語白話化 0 命中（L1 黑話）；L2 框架詞 {r['l2_total']} 處（保留專業感，僅統計）{tag}")
 
 
 def run_qa(case_name, cases_dir="cases", extra_pollute=(), must_words=(),
@@ -197,6 +222,12 @@ def run_qa(case_name, cases_dir="cases", extra_pollute=(), must_words=(),
             else:
                 p(f"✓ PPT 合规功效词 0 处非否定语境{t}")
 
+        # 8. 術語白話化（L1 黑話 0 命中）
+        bad, line = jargon_line(full, t)
+        p(line)
+        if bad:
+            fail += 1
+
     # ---- HTML 交付物检查（逐份）----
     if htmls:
         for hfn, hfp in htmls:
@@ -218,6 +249,19 @@ def run_qa(case_name, cases_dir="cases", extra_pollute=(), must_words=(),
                     p(f"✗ 话题词 HTML 合规功效词 {hb2} 处非否定语境{t}"); fail += 1
                 else:
                     p(f"✓ 话题词 HTML 合规功效词 0 处非否定语境{t}")
+            bad, line = jargon_line(htext, t)
+            p(line)
+            if bad:
+                fail += 1
+
+    # ---- 講稿等文本交付物（.md）術語白話化 ----
+    mdfiles = [fn for fn in sorted(os.listdir(out_dir)) if fn.lower().endswith(".md")]
+    for mfn in mdfiles:
+        mtext = io.open(os.path.join(out_dir, mfn), encoding="utf-8").read()
+        bad, line = jargon_line(mtext, tag(mfn))
+        p(line)
+        if bad:
+            fail += 1
 
     # ---- 采集证据 manifest 检查（Phase 2 新增）----
     #      证据报告里的截图内文字无法被 HTML 文本扫描覆盖，

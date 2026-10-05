@@ -8,7 +8,7 @@ kind:   absent=对手出现本品牌缺席 / negative=本品牌负面提及 / wr
 level:  A=线上实查（带日期与来源）/ B=客户提供 / C=诊断模型估算
 所有品牌、竞品均为通用占位，新案例复制本文件后逐项替换。
 
-> 版本口径：`VERSION_SCOPE` 是**展示字段**，须与 config.py 的引擎开关 `VERSION` 一致——
+> 版本说明：`VERSION_SCOPE` 是**展示字段**，须与 config.py 的引擎开关 `VERSION` 一致——
 >   VERSION="domestic" → VERSION_SCOPE="国内版"
 >   VERSION="overseas" → VERSION_SCOPE="海外版"
 >   VERSION="both"     → VERSION_SCOPE="双版"

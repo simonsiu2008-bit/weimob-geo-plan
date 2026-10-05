@@ -19,7 +19,7 @@ CONFIG 新增可选键（engine/lang_style.py 定义）：
                 卡片栅格封面/结尾 + 编号 chip 页眉 + 粗描边卡片）
 - VERSION       "domestic"（默认，只讲国内 6 平台）| "overseas"（只讲海外 5 平台）
                 | "both"（国内 6 主 + 海外 5 辅，历史叙事）
-                版本维度只影响「平台叙述与 KPI 口径」，20 页结构与 QA 约束完全不变。
+                版本维度只影响「平台叙述与 KPI 目标」，20 页结构与 QA 约束完全不变。
                 实现：语言的 ver_* 键为 {domestic/overseas/both: 文案} 字典，
                 经内联 DV(key) 按当前 VERSION 取值；未声明版本的历史包 DV 自动回退原值。
 两版本并行输出由 build_deck.py 按 VISUAL_STYLES 循环完成；classic 文件名保持不变（原版本保留）。
@@ -138,6 +138,14 @@ def build_deck(config, palette, output_path):
     # 增强变量（可选）
     VIS_DUAL = V("VIS_DUAL"); RANK_POOL = V("RANK_POOL")
     SOURCE_CITE = V("SOURCE_CITE"); COMPLIANCE = V("COMPLIANCE", {"applicable": False})
+
+    # ---- v4 個案化文案兼容層（2026-10 由 v4 引擎移植）----
+    # 三個「每客戶不同」的文案槽位：案例未提供時沿用 v2.4 語言包預設（向後兼容），
+    # 提供時才覆蓋 —— 舊案例（meiriki / ori 等）的個案文案因此不會被引擎吞掉。
+    INDUSTRY_SUB = V("INDUSTRY_SUB", None)        # P4 行業定位副標題
+    PREF_SCORE_TEXT = V("PREF_SCORE_TEXT", None)  # P9 可被 AI 采信度評分
+    INFRA_FOOTNOTE = V("INFRA_FOOTNOTE", None)    # P11 基建總評腳註
+    EXCELLENT_LINE = float(V("EXCELLENT_LINE", 0.70))  # P5「優秀線」基準（個案可覆蓋）
 
     # ---- 工具函数 ----
     slide_state = {"n": 0}
@@ -337,7 +345,7 @@ def build_deck(config, palette, output_path):
     # Slide 4 — 行業 AI 搜索現狀
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, D["s4_head"], DV("ver_s4_sub").format(pt=PRODUCT_TYPE))
+    header(s, D["s4_head"], INDUSTRY_SUB or DV("ver_s4_sub").format(pt=PRODUCT_TYPE))
     x = Inches(0.8)
     for big, label, col, src in STAT_CARDS:
         rect(s, x, Inches(1.6), Inches(3.7), Inches(3.5), fill=C["WHITE"], line=CM[col], line_w=1.5, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
@@ -360,7 +368,8 @@ def build_deck(config, palette, output_path):
     rect(s, Inches(1.1), Inches(4.45), Inches(4.8), Inches(1.5), fill=C["BLUE"], shape=MSO_SHAPE.ROUNDED_RECTANGLE)
     txt(s, Inches(1.1), Inches(4.6), Inches(4.8), Inches(0.55), D["s5_gap"].format(pct=GAP_PCT), size=22, color=C["WHITE"], bold=True, align=PP_ALIGN.CENTER)
     txt(s, Inches(1.1), Inches(5.15), Inches(4.8), Inches(0.75),
-        D["s5_gap_sub"].format(n=int(CITE_RATE * 100), d=round(0.70 - CITE_RATE, 2)), size=11.5, color=C["WHITE"], align=PP_ALIGN.CENTER)
+        D["s5_gap_sub"].format(n=int(CITE_RATE * 100), d=round(EXCELLENT_LINE - CITE_RATE, 2),
+                                   e=f"{EXCELLENT_LINE:.2f}"), size=11.5, color=C["WHITE"], align=PP_ALIGN.CENTER)
     if VIS_DUAL:
         txt(s, Inches(0.85), Inches(6.0), Inches(5.4), Inches(0.5),
             D["s5_dual"].format(b=f"{VIS_DUAL['brand_word']:.0%}", c=f"{VIS_DUAL['category_word']:.0%}",
@@ -406,7 +415,7 @@ def build_deck(config, palette, output_path):
     # Slide 9 — 引用偏好框架（7 維度）
     # ================================================================
     s = slide(); bg(s, C["CLOUD"])
-    header(s, D["s9_head"], D["s9_sub"])
+    header(s, D["s9_head"], PREF_SCORE_TEXT or D["s9_sub"])
     table(s, Inches(0.8), Inches(1.55), Inches(11.7), Inches(5.0), D["s9_table"],
           [2.4, 4.6, 1.8, 2.9], fs=12, rh=0.55)
     txt(s, Inches(0.8), Inches(6.7), Inches(11.6), Inches(0.35), D["s9_note"], size=10.5, color=C["GRAY"])
@@ -432,9 +441,9 @@ def build_deck(config, palette, output_path):
     chart.series[1].format.line.color.rgb = _cs1
     chart.series[1].format.line.width = Pt(2)
     chart.series[1].format.fill.solid(); chart.series[1].format.fill.fore_color.rgb = _cs1
-    # P10 注释支持 config 可选覆盖（AIVO_INFRA_NOTE/AIVO_COMP_NOTE/AIVO_SENT_NOTE），未设置走语言包默认
+    # P10 注释支持 config 可选覆盖（AIVO_VIS/INFRA/COMP/SENT_NOTE），未设置走语言包默认
     _s10_notes = [
-        D["s10_notes"][0].format(rate=CITE_RATE),
+        V("AIVO_VIS_NOTE") or D["s10_notes"][0].format(rate=CITE_RATE),
         V("AIVO_INFRA_NOTE") or D["s10_notes"][1],
         V("AIVO_COMP_NOTE") or D["s10_notes"][2],
         V("AIVO_SENT_NOTE") or D["s10_notes"][3],
@@ -466,7 +475,7 @@ def build_deck(config, palette, output_path):
         txt(s, x + Inches(1.9), Inches(2.6), cw - Inches(2.1), Inches(0.8), D["s11_unit"], size=13, color=C["GRAY"])
         txt(s, x + Inches(0.25), Inches(3.7), cw - Inches(0.5), Inches(2.3), body, size=13, color=C["INK"])
         x += cw + Inches(0.35)
-    txt(s, Inches(0.8), Inches(6.5), Inches(11.6), Inches(0.4), D["s11_note"], size=11.5, color=C["INK"])
+    txt(s, Inches(0.8), Inches(6.5), Inches(11.6), Inches(0.4), INFRA_FOOTNOTE or D["s11_note"], size=11.5, color=C["INK"])
 
     # ================================================================
     # Slide 12 — 輿情風險監控

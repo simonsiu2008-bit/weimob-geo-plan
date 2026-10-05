@@ -168,6 +168,24 @@
 12. **雙軌純淨性**：客戶版 PPT/HTML 中不得出現現場話術（`script_v`）；銷售版 `.md` 須含「內部資料，僅限銷售使用」。
 13. **證據卡檢查（若有交付）**：每卡帶 A/B/C 級別；頁眉有「示意問答還原」聲明；痛點與建議為白話（過 `plain_language.md` 術語自查）；禁忌標記為 0。
 14. **版本範圍一致**：`VERSION` / `VERSION_SCOPE` 與 DIAG 口徑、平臺列表、監測池、證據卡 badge 多處一致。
+15. **術語白話化（硬性）**：交付物中 **L1 內地黑話必須 0 命中**（基線／口徑／閉環／矩陣／對齊／歸因／錨點／賦能…），
+   由 `scripts/engine/jargon.py` 字典掃描，`qa_engine` 第 8 項逐份（PPT/HTML/`.md` 講稿）檢查；L2 框架詞
+   （AIVO／GEO／召回／收錄／結構化…）保留專業感，僅統計不判失敗。新客戶術語可加入 `JARGON_ALLOW` 白名單。
+   ⚠️ 字典須**繁＋簡兩套**：簡體交付物與繁體（hk_business）交付物都要覆蓋。
+
+### 個案化字段（選填，未設時回退語言包預設）
+
+「每客戶不同」的文案一律走 `config.py`，不寫死在引擎裡——舊案例沒填也能正常產出（向後兼容）：
+
+| 欄位 | 作用 | 未填時 |
+|---|---|---|
+| `EXCELLENT_LINE` | 第 5 頁「優秀線」基準（如 0.55） | 0.70 |
+| `INDUSTRY_SUB` | 第 4 頁行業定位副標題 | 語言包 `ver_s4_sub` |
+| `PREF_SCORE_TEXT` | 第 9 頁「可被 AI 采信度評分 XX / 100」 | 語言包 `s9_sub` |
+| `INFRA_FOOTNOTE` | 第 11 頁基建總評腳註 | 語言包 `s11_note` |
+| `AIVO_VIS_NOTE` / `AIVO_INFRA_NOTE` / `AIVO_COMP_NOTE` / `AIVO_SENT_NOTE` | 第 10 頁四維個案註釋 | 語言包 `s10_notes` |
+| `SENTIMENT_BULLETS` / `SENTIMENT_ACTIONS` | 第 12 頁輿情發現與動作 | 模板佔位（務必個案化） |
+| `PREF_ROWS` / `PREF_FOOTNOTE` | 第 9 頁偏好維度表與腳註 | 引擎通用表 |
 
 ### 合規專項自查腳本（受監管品類）
 

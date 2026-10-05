@@ -177,7 +177,7 @@ def build_evidence_html(ec):
         BRAND        品牌名
         BRAND_SUB    副标题
         MANIFEST     采集结果 manifest.json 路径（或已加载的 dict）
-        BASE_DIR     截图相对路径的基准目录（默认 manifest 所在目录）
+        BASE_DIR     截图相对路径的参照目录（默认 manifest 所在目录）
         EMBED        True → base64 内联
         OUT_TITLE    可选，报告标题
     """

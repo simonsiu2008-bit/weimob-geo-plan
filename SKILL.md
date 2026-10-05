@@ -206,7 +206,7 @@ python3 scripts/build_talktrack.py cases/<name>
 python3 scripts/qa_check.py <case>
 ```
 檢查器自動覆蓋：頁數=20 / 禁忌標記=0 / 佔位符=0 / OOB=0 / `診斷模型估算`≥2 /
-**跨 case 污染反查（掃描全部其他 case 的 pollute_words）/ 話題詞 HTML 反查 / 合規功效詞否定語境**。
+**跨 case 污染反查（掃描全部其他 case 的 pollute_words）/ 話題詞 HTML 反查 / 合規功效詞否定語境 / **術語白話化（L1 黑話 0 命中，見 `scripts/engine/jargon.py`）**。
 退出碼 0 為通過。
 
 人工另需複核：
@@ -279,6 +279,8 @@ python3 scripts/qa_check.py <case>
 - 本 skill 的引擎與方法論設計已覆蓋多個行業（商務藍 / 日式健康青 / 自然保育綠 等 palette，非監管與受監管品類）。**發佈版不含任何真實客戶案例**；真實案例以脫敏模板為基礎按需生成。
 - **數據隔離是本 skill 最高優先硬性要求**：案例間不得穿透。換新客戶 = 新建 `cases/<name>/`，QA 自動跨 case 反查兜底。
 - **模板污染是第二高風險**：換客戶時務必逐項替換 CONFIG 的 `ECO_MAP` / `SOURCE_TABLE` / `SENTIMENT_BULLETS` / `GAP_ROWS` / `CAPABILITY_MAP` / `ROADMAP_TABLE`，並在 Step 7 用其他 case 的 `pollute_words` 反查。
+- **`pollute_words.txt` 必須是本案例專屬詞**：從既有案例複製起點時最易漏改。症狀是「**別的案例** QA 突然失敗，且命中詞全是本案例自己的品牌/行業詞」——此時要修的是本案例的 `pollute_words.txt`，不要去改別案例的產物。已踩過一次（2026-10-05）。
+- **案例檔自帶內地黑話**：`config.py` / `topic_config.py` / `evidence_config.py` 的文案常殘留「基線 / 口徑 / 閉環 / 矩陣」等內地術語；QA 第 9 項會擋，但重建前先對案例檔跑一次 `jargon.scan()` 可省一輪返工。字典需**繁＋簡兩套**（PPT 繁體、HTML 簡體）。
 - **合規污染是第三高風險**：功效詞一旦出現在交付物，客戶可能承擔廣告法與食品安全法風險。受監管品類務必四處同查。
 - 估算數據為模型模擬收錄；**Step 1.5 線上實查為硬性前置**——能實查的公開證據一律先實查（A 級），實查不到的 AI 平臺內問答場景才用估算（C 級），且痛點呈現優先用證據卡還原而非裸數字。
 - 20 頁是硬約束。新增能力一律以「CONFIG 條件插字」或「獨立 HTML 交付物」實現，不得新增頁面或形狀。
